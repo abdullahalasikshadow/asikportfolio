@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import { ArrowDown, ArrowUpRight } from 'lucide-react'
 import { DhakaClock } from '@/components/dhaka-clock'
+import { Logo } from '@/components/logo'
 import { HeroCanvas } from '@/components/hero-canvas'
 import { LabSection } from '@/components/lab-section'
 import { PortfolioInteractions } from '@/components/portfolio-interactions'
@@ -72,9 +73,7 @@ export function PortfolioPage() {
 
       <header className="site-header">
         <a className="site-brand" href="#top" aria-label="Abdullah Al Asik, home">
-          <span className="site-brand-mark" aria-hidden="true">
-            A/A
-          </span>
+          <Logo className="site-brand-mark" />
           <span className="site-brand-copy">
             Statistics
             <br />
@@ -323,9 +322,7 @@ export function PortfolioPage() {
 
       <footer className="site-footer">
         <p className="footer-copy">© 2026 Abdullah Al Asik</p>
-        <span className="footer-mark" aria-hidden="true">
-          A/A
-        </span>
+        <Logo className="footer-mark" />
         <div className="local-time">
           <span className="local-time-label">Dhaka local time</span>
           <DhakaClock />
