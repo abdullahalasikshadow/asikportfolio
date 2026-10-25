@@ -414,42 +414,178 @@
   border-left: 1px solid var(--line);
 }
 
-.avatar-mark {
+.portrait-figure {
   position: relative;
-  display: grid;
-  width: 3.5rem;
-  height: 3.5rem;
+  margin: 0;
+}
+
+.portrait-figure--hero {
+  width: clamp(4.75rem, 10vw, 8rem);
   flex: 0 0 auto;
-  place-items: center;
-  overflow: hidden;
-  border: 1px solid rgb(215 247 109 / 52%);
-  border-radius: 50%;
-  background: radial-gradient(circle at 50% 40%, rgb(215 247 109 / 16%), transparent 67%);
-  color: var(--acid);
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 1.55rem;
-  letter-spacing: -0.08em;
 }
 
-.avatar-mark::before,
-.avatar-mark::after {
-  position: absolute;
-  width: 140%;
-  height: 1px;
-  background: rgb(215 247 109 / 22%);
-  content: '';
-  transform: rotate(-42deg);
+.portrait-figure--about {
+  width: 100%;
 }
 
-.avatar-mark::after {
-  transform: rotate(42deg);
-}
-
-.avatar-mark span {
+.portrait-frame {
   position: relative;
-  z-index: 1;
-  padding-right: 0.08em;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid rgb(215 247 109 / 40%);
   background: var(--background);
+  clip-path: inset(0);
+}
+
+.portrait-image {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.76) sepia(0.1) hue-rotate(8deg) brightness(0.9) contrast(1.04);
+  transform: scale(1.04);
+  transform-origin: 50% 45%;
+  transition: filter 760ms cubic-bezier(0.2, 0.7, 0.2, 1), transform 760ms cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: transform;
+}
+
+.portrait-frame--quiet .portrait-image {
+  filter: saturate(0.82) sepia(0.08) hue-rotate(8deg) brightness(0.94) contrast(1.02);
+  transform: scale(1.23);
+  transform-origin: 50% 42%;
+}
+
+.portrait-frame::before {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  background:
+    linear-gradient(var(--acid), var(--acid)) left top / 9px 1px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) left top / 1px 9px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) right top / 9px 1px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) right top / 1px 9px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) left bottom / 9px 1px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) left bottom / 1px 9px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) right bottom / 9px 1px no-repeat,
+    linear-gradient(var(--acid), var(--acid)) right bottom / 1px 9px no-repeat;
+  content: '';
+  pointer-events: none;
+}
+
+.portrait-tint,
+.portrait-vignette,
+.portrait-grain,
+.portrait-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.portrait-tint {
+  z-index: 1;
+  background: rgb(9 11 8 / 22%);
+  mix-blend-mode: multiply;
+  opacity: 0.62;
+  transition: opacity 760ms cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.portrait-vignette {
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at 50% 42%, transparent 34%, rgb(9 11 8 / 48%) 100%),
+    linear-gradient(180deg, rgb(9 11 8 / 8%), transparent 30%, rgb(9 11 8 / 32%));
+  opacity: 0.78;
+}
+
+.portrait-grain {
+  z-index: 3;
+  background-image:
+    radial-gradient(rgb(240 240 231 / 42%) 0.45px, transparent 0.75px),
+    radial-gradient(rgb(9 11 8 / 45%) 0.45px, transparent 0.75px);
+  background-position: 0 0, 2px 3px;
+  background-size: 4px 4px, 5px 5px;
+  mix-blend-mode: screen;
+  opacity: 0.13;
+}
+
+.portrait-grid {
+  z-index: 4;
+  background-image: radial-gradient(circle, rgb(215 247 109 / 60%) 0.5px, transparent 0.7px);
+  background-size: 11px 11px;
+  mask-image: linear-gradient(180deg, #000 0%, transparent 76%);
+  opacity: 0.17;
+}
+
+.portrait-tick {
+  position: absolute;
+  z-index: 6;
+  background: var(--acid);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.portrait-tick--top {
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 8px;
+}
+
+.portrait-tick--side {
+  top: 50%;
+  right: 0;
+  width: 8px;
+  height: 1px;
+}
+
+.portrait-frame--quiet {
+  border-color: rgb(215 247 109 / 28%);
+}
+
+.portrait-frame--quiet::before,
+.portrait-frame--quiet .portrait-tick {
+  opacity: 0.45;
+}
+
+.portrait-frame--quiet .portrait-tint {
+  opacity: 0.34;
+}
+
+.portrait-frame--quiet .portrait-vignette {
+  opacity: 0.5;
+}
+
+.portrait-frame--quiet .portrait-grain {
+  opacity: 0.08;
+}
+
+.portrait-frame--quiet .portrait-grid {
+  opacity: 0.1;
+}
+
+.portrait-caption {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.48rem;
+  color: var(--soft);
+  font-size: 0.47rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.portrait-frame:hover .portrait-image {
+  filter: none;
+}
+
+.portrait-frame:hover .portrait-tint {
+  opacity: 0;
 }
 
 .hero-avatar-copy {
@@ -548,11 +684,20 @@
   text-transform: uppercase;
 }
 
-.about-plot svg {
+.about-plot-visual {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(4.5rem, 10vw, 7.25rem);
+  align-items: end;
+  gap: clamp(1rem, 3vw, 2.5rem);
+  margin-top: 1rem;
+}
+
+.about-plot-visual svg {
   display: block;
   width: 100%;
-  height: clamp(100px, 14vw, 170px);
-  margin-top: 1rem;
+  min-width: 0;
+  height: clamp(90px, 14vw, 150px);
+  margin: 0;
   overflow: visible;
 }
 
@@ -1477,10 +1622,8 @@ html.has-custom-cursor .portfolio-cursor[data-visible='true'] {
     padding-left: 0.7rem;
   }
 
-  .avatar-mark {
-    width: 2.8rem;
-    height: 2.8rem;
-    font-size: 1.25rem;
+  .portrait-figure--hero {
+    width: 4.25rem;
   }
 
   .hero-avatar-copy span:last-child {

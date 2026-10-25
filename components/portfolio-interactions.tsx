@@ -76,6 +76,42 @@ export function PortfolioInteractions() {
         )
       }
 
+      gsap.utils.toArray<HTMLElement>('[data-portrait-frame]').forEach((frame) => {
+        const image = frame.querySelector<HTMLImageElement>('[data-portrait-image]')
+        if (!image) return
+
+        const isHero = frame.dataset.portraitHero === 'true'
+        const revealOptions = {
+          clipPath: 'inset(0 0 0% 0)',
+          duration: isHero ? 1.15 : 0.9,
+          ease: 'power3.inOut',
+        }
+
+        if (isHero) {
+          gsap.fromTo(frame, { clipPath: 'inset(0 0 100% 0)' }, { ...revealOptions, delay: 0.32 })
+        } else {
+          gsap.fromTo(frame, { clipPath: 'inset(0 0 100% 0)' }, {
+            ...revealOptions,
+            scrollTrigger: {
+              trigger: frame,
+              start: 'top 88%',
+              once: true,
+            },
+          })
+        }
+
+        gsap.to(image, {
+          yPercent: isHero ? -4 : -2,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: frame,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+        })
+      })
+
       gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((element) => {
         gsap.fromTo(
           element,

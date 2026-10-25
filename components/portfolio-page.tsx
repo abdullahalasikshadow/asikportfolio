@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { ArrowDown, ArrowUpRight } from 'lucide-react'
 import { DhakaClock } from '@/components/dhaka-clock'
 import { HeroCanvas } from '@/components/hero-canvas'
@@ -19,6 +20,44 @@ const personStructuredData = {
   },
   sameAs: [githubUrl],
   knowsAbout: ['Statistical analysis', 'Full-stack engineering', 'Cinematic design'],
+}
+
+function PortraitFrame({ variant }: { variant: 'hero' | 'about' }) {
+  const isHero = variant === 'hero'
+
+  return (
+    <figure className={`portrait-figure ${isHero ? 'portrait-figure--hero' : 'portrait-figure--about'}`}>
+      <div
+        className={`portrait-frame ${isHero ? 'portrait-frame--hero' : 'portrait-frame--quiet'}`}
+        data-portrait-frame
+        data-portrait-hero={isHero ? 'true' : undefined}
+      >
+        <Image
+          className="portrait-image"
+          src="/asik-portrait.webp"
+          alt="Portrait of Abdullah Al Asik"
+          width={1600}
+          height={2133}
+          priority={isHero}
+          quality={82}
+          sizes={
+            isHero
+              ? '(max-width: 760px) 76px, (max-width: 1280px) 10vw, 128px'
+              : '(max-width: 760px) 72px, (max-width: 1160px) 10vw, 116px'
+          }
+          data-portrait-image="true"
+          style={{ objectPosition: isHero ? '50% 45%' : '50% 42%' }}
+        />
+        <span className="portrait-tint" aria-hidden="true" />
+        <span className="portrait-vignette" aria-hidden="true" />
+        <span className="portrait-grain" aria-hidden="true" />
+        <span className="portrait-grid" aria-hidden="true" />
+        <span className="portrait-tick portrait-tick--top" aria-hidden="true" />
+        <span className="portrait-tick portrait-tick--side" aria-hidden="true" />
+      </div>
+      {isHero && <figcaption className="portrait-caption">Fig. 01, Dhaka</figcaption>}
+    </figure>
+  )
 }
 
 export function PortfolioPage() {
@@ -96,9 +135,7 @@ export function PortfolioPage() {
                 </a>
 
                 <div className="hero-avatar-lockup">
-                  <div className="avatar-mark" role="img" aria-label="AA monogram avatar for Abdullah Al Asik">
-                    <span>AA</span>
-                  </div>
+                  <PortraitFrame variant="hero" />
                   <div className="hero-avatar-copy">
                     <span>Based in</span>
                     <span>Dhaka, Bangladesh</span>
@@ -136,25 +173,28 @@ export function PortfolioPage() {
             </div>
           </div>
 
-          <div className="about-plot" data-reveal aria-hidden="true">
+          <div className="about-plot" data-reveal>
             <div className="plot-caption">
               <span>Observation / interpretation</span>
               <span>Signal 01 — 03</span>
             </div>
-            <svg viewBox="0 0 1000 150" preserveAspectRatio="none">
-              <line className="plot-grid-line" x1="0" y1="30" x2="1000" y2="30" />
-              <line className="plot-grid-line" x1="0" y1="75" x2="1000" y2="75" />
-              <line className="plot-grid-line" x1="0" y1="120" x2="1000" y2="120" />
-              <path
-                className="plot-curve"
-                data-curve-line
-                d="M 0 119 C 98 113, 139 102, 212 102 C 295 102, 321 38, 396 34 C 474 29, 492 94, 579 93 C 677 92, 706 58, 785 63 C 866 69, 906 90, 1000 74"
-              />
-              <circle className="plot-point" cx="212" cy="102" r="3" />
-              <circle className="plot-point" cx="396" cy="34" r="3" />
-              <circle className="plot-point" cx="579" cy="93" r="3" />
-              <circle className="plot-point" cx="785" cy="63" r="3" />
-            </svg>
+            <div className="about-plot-visual">
+              <svg viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
+                <line className="plot-grid-line" x1="0" y1="30" x2="1000" y2="30" />
+                <line className="plot-grid-line" x1="0" y1="75" x2="1000" y2="75" />
+                <line className="plot-grid-line" x1="0" y1="120" x2="1000" y2="120" />
+                <path
+                  className="plot-curve"
+                  data-curve-line
+                  d="M 0 119 C 98 113, 139 102, 212 102 C 295 102, 321 38, 396 34 C 474 29, 492 94, 579 93 C 677 92, 706 58, 785 63 C 866 69, 906 90, 1000 74"
+                />
+                <circle className="plot-point" cx="212" cy="102" r="3" />
+                <circle className="plot-point" cx="396" cy="34" r="3" />
+                <circle className="plot-point" cx="579" cy="93" r="3" />
+                <circle className="plot-point" cx="785" cy="63" r="3" />
+              </svg>
+              <PortraitFrame variant="about" />
+            </div>
           </div>
         </section>
 

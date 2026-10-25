@@ -1,10 +1,19 @@
+import { readFile } from 'node:fs/promises'
+import { join } from 'node:path'
 import { ImageResponse } from 'next/og'
 
-export const alt = 'Abdullah Al Asik — Statistics × Systems × Image'
+export const runtime = 'nodejs'
+export const alt = 'Abdullah Al Asik — portrait — Statistics × Systems × Image'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-export default function OpenGraphImage() {
+const portraitSrcPromise = readFile(join(process.cwd(), 'public', 'asik-portrait-og.jpg'), 'base64').then(
+  (portraitData) => `data:image/jpeg;base64,${portraitData}`,
+)
+
+export default async function OpenGraphImage() {
+  const portraitSrc = await portraitSrcPromise
+
   return new ImageResponse(
     (
       <div
@@ -58,7 +67,36 @@ export default function OpenGraphImage() {
           <span>A/A</span>
           <span style={{ color: '#a7ae9d' }}>FIELD NOTES / 01</span>
         </div>
-        <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: '132px',
+            right: '72px',
+            display: 'flex',
+            width: '248px',
+            height: '310px',
+            overflow: 'hidden',
+            border: '1px solid rgba(215, 247, 109, 0.5)',
+            background: '#0d100c',
+          }}
+        >
+          <img
+            src={portraitSrc}
+            alt="Portrait of Abdullah Al Asik"
+            width={248}
+            height={310}
+            style={{ display: 'block', width: 248, height: 310, objectFit: 'cover' }}
+          />
+        </div>
+        <div
+          style={{
+            position: 'relative',
+            display: 'flex',
+            maxWidth: '720px',
+            flexDirection: 'column',
+            gap: '2px',
+          }}
+        >
           <span
             style={{
               fontFamily: 'Georgia, serif',
