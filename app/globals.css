@@ -1232,9 +1232,10 @@
   left: 0;
   width: 1.5rem;
   height: 1.5rem;
-  border: 1px solid var(--acid);
+  border: 1px solid #ffffff;
   border-radius: 50%;
-  background: rgb(215 247 109 / 10%);
+  background: rgb(255 255 255 / 10%);
+  mix-blend-mode: difference;
   opacity: 0;
   pointer-events: none;
   transition: width 200ms ease, height 200ms ease, background 200ms ease, opacity 200ms ease;
@@ -1249,7 +1250,7 @@
   width: 3px;
   height: 3px;
   border-radius: 50%;
-  background: var(--acid);
+  background: #ffffff;
   content: '';
   transform: translate(-50%, -50%);
 }
@@ -1258,7 +1259,7 @@
   width: 0.25rem;
   height: 0.25rem;
   background: transparent;
-  outline: 1px solid rgb(215 247 109 / 70%);
+  outline: 1px solid rgb(255 255 255 / 70%);
   outline-offset: 0.25rem;
 }
 
@@ -1274,7 +1275,7 @@ html.has-custom-cursor .portfolio-cursor[data-visible='true'] {
 .portfolio-cursor[data-active='true'] {
   width: 2.8rem;
   height: 2.8rem;
-  background: rgb(215 247 109 / 20%);
+  background: rgb(255 255 255 / 20%);
 }
 
 @media (min-width: 1100px) {
