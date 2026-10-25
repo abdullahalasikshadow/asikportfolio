@@ -192,11 +192,9 @@
 }
 
 .site-brand-mark {
+  display: block;
+  flex: none;
   color: var(--acid);
-  font-family: var(--font-display), serif;
-  font-size: 1.8rem;
-  letter-spacing: -0.08em;
-  line-height: 1;
 }
 
 .site-brand-copy {
@@ -1079,10 +1077,9 @@
 }
 
 .footer-mark {
+  display: block;
+  flex: none;
   color: var(--acid);
-  font-family: var(--font-display), Georgia, serif;
-  font-size: 1.8rem;
-  letter-spacing: -0.08em;
 }
 
 .local-time {
