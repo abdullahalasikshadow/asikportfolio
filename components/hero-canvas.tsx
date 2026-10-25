@@ -14,7 +14,7 @@ function seededValue(seed: number) {
   return value - Math.floor(value)
 }
 
-const particles: Particle[] = Array.from({ length: 270 }, (_, index) => ({
+const particles: Particle[] = Array.from({ length: 220 }, (_, index) => ({
   t: seededValue(index + 1) * 5.6 - 2.8,
   scatter: seededValue(index + 271) - 0.5,
   phase: seededValue(index + 541) * Math.PI * 2,
@@ -30,27 +30,29 @@ export function HeroCanvas() {
 
   useEffect(() => {
     const canvas = canvasRef.current
-    if (!canvas) return
+    const candidateHostElement = canvas?.parentElement
+    const context = canvas?.getContext('2d', { alpha: true })
+    if (!canvas || !candidateHostElement || !context) return
 
-    const parent = canvas.parentElement
-    if (!parent) return
-
-    const context = canvas.getContext('2d', { alpha: true })
-    if (!context) return
-
-    const drawingContext = context as CanvasRenderingContext2D
-    const hostElement = parent as HTMLElement
-    const canvasElement = canvas as HTMLCanvasElement
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    const activeCanvas = canvas as HTMLCanvasElement
+    const activeHostElement = candidateHostElement as HTMLElement
+    const drawingContext = context
+    const reducedMotionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const coarsePointerQuery = window.matchMedia('(pointer: coarse)')
+    const mobileQuery = window.matchMedia('(max-width: 767px)')
+    let prefersReducedMotion = reducedMotionQuery.matches
+    let isCoarsePointer = coarsePointerQuery.matches
+    let isMobile = mobileQuery.matches
+    let activeParticles = particles.slice(0, isMobile ? 90 : 220)
     let width = 0
     let height = 0
     let frame = 0
+    let isVisible = false
     let pointerX = -1000
     let pointerY = -1000
-    let scrollProgress = 0
+    const animationStartedAt = performance.now()
 
-    function draw() {
+    function draw(now = performance.now()) {
       drawingContext.clearRect(0, 0, width, height)
       if (!width || !height) return
 
@@ -72,8 +74,8 @@ export function HeroCanvas() {
       const baseline = height * 0.78
       const sigma = Math.max(40, width * (isCoarsePointer ? 0.2 : 0.155))
       const amplitude = height * (isCoarsePointer ? 0.34 : 0.47)
-      const settle = clamp(scrollProgress, 0, 1)
-      const scatterScale = height * (0.24 - settle * 0.17)
+      const settle = prefersReducedMotion ? 1 : clamp((now - animationStartedAt) / 2500, 0, 1)
+      const scatterScale = height * (0.24 * (1 - settle) + 0.012 * settle)
 
       drawingContext.beginPath()
       for (let step = 0; step <= 120; step += 1) {
@@ -83,8 +85,9 @@ export function HeroCanvas() {
         if (step === 0) drawingContext.moveTo(x, y)
         else drawingContext.lineTo(x, y)
       }
-      drawingContext.strokeStyle = `rgba(215, 247, 109, ${0.2 + settle * 0.42})`
-      drawingContext.lineWidth = 1.25
+      const curveOpacity = Math.min(0.96, (0.2 + settle * 0.42) * 2.5)
+      drawingContext.strokeStyle = `rgba(215, 247, 109, ${curveOpacity})`
+      drawingContext.lineWidth = 1.5
       drawingContext.stroke()
 
       drawingContext.save()
@@ -97,11 +100,12 @@ export function HeroCanvas() {
       drawingContext.stroke()
       drawingContext.restore()
 
-      particles.forEach((particle, index) => {
+      activeParticles.forEach((particle, index) => {
         const bell = Math.exp(-0.5 * particle.t * particle.t)
+        const curveY = baseline - amplitude * bell
         let x = centerX + particle.t * sigma
-        let y = baseline - amplitude * bell + particle.scatter * scatterScale
-        y += Math.sin(particle.phase + performance.now() * 0.00035) * (prefersReducedMotion ? 0 : 1.8)
+        let y = curveY + particle.scatter * scatterScale
+        y += Math.sin(particle.phase + now * 0.00035) * (prefersReducedMotion ? 0 : 1.8)
 
         if (!isCoarsePointer && pointerX >= 0 && pointerY >= 0) {
           const dx = x - pointerX
@@ -116,29 +120,47 @@ export function HeroCanvas() {
 
         if (x < -4 || x > width + 4) return
 
-        const opacity = 0.18 + bell * 0.52
+        const proximity = 1 - clamp(Math.abs(y - curveY) / Math.max(height * 0.16, 1), 0, 1)
+        const opacity = 0.12 + bell * 0.16 + proximity * 0.64
         drawingContext.beginPath()
         drawingContext.arc(x, y, particle.size, 0, Math.PI * 2)
-        drawingContext.fillStyle = index % 5 === 0
+        drawingContext.fillStyle = index % 5 === 0 || proximity > 0.76
           ? `rgba(215, 247, 109, ${opacity})`
           : `rgba(240, 240, 231, ${opacity * 0.58})`
         drawingContext.fill()
       })
     }
 
+    function animate(now: number) {
+      if (!isVisible || prefersReducedMotion) return
+      draw(now)
+      frame = window.requestAnimationFrame(animate)
+    }
+
+    function setVisibility(visible: boolean) {
+      isVisible = visible
+      window.cancelAnimationFrame(frame)
+      if (visible) {
+        draw()
+        if (!prefersReducedMotion) frame = window.requestAnimationFrame(animate)
+      }
+    }
+
     function resize() {
-      const rect = hostElement.getBoundingClientRect()
+      const rect = activeHostElement.getBoundingClientRect()
       width = Math.max(1, rect.width)
       height = Math.max(1, rect.height)
-      const pixelRatio = Math.min(window.devicePixelRatio || 1, isCoarsePointer ? 1.2 : 1.5)
-      canvasElement.width = Math.round(width * pixelRatio)
-      canvasElement.height = Math.round(height * pixelRatio)
+      isMobile = mobileQuery.matches
+      activeParticles = particles.slice(0, isMobile ? 90 : 220)
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2)
+      activeCanvas.width = Math.round(width * pixelRatio)
+      activeCanvas.height = Math.round(height * pixelRatio)
       drawingContext.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0)
       draw()
     }
 
     function handlePointerMove(event: PointerEvent) {
-      const rect = hostElement.getBoundingClientRect()
+      const rect = activeHostElement.getBoundingClientRect()
       pointerX = event.clientX - rect.left
       pointerY = event.clientY - rect.top
     }
@@ -148,35 +170,33 @@ export function HeroCanvas() {
       pointerY = -1000
     }
 
-    function handleScroll() {
-      scrollProgress = clamp(window.scrollY / Math.max(height * 0.9, 1), 0, 1)
-      if (prefersReducedMotion) draw()
+    function handleMotionChange(event: MediaQueryListEvent) {
+      prefersReducedMotion = event.matches
+      setVisibility(isVisible)
     }
 
     const resizeObserver = new ResizeObserver(resize)
-    resizeObserver.observe(parent)
-    window.addEventListener('scroll', handleScroll, { passive: true })
+    resizeObserver.observe(activeHostElement)
+    const visibilityObserver = new IntersectionObserver(([entry]) => {
+      setVisibility(Boolean(entry?.isIntersecting))
+    })
+    visibilityObserver.observe(activeHostElement)
 
     if (!isCoarsePointer) {
-      hostElement.addEventListener('pointermove', handlePointerMove, { passive: true })
-      hostElement.addEventListener('pointerleave', handlePointerLeave)
+      activeHostElement.addEventListener('pointermove', handlePointerMove, { passive: true })
+      activeHostElement.addEventListener('pointerleave', handlePointerLeave)
     }
 
+    reducedMotionQuery.addEventListener('change', handleMotionChange)
     resize()
-    if (!prefersReducedMotion) {
-      const animate = () => {
-        draw()
-        frame = window.requestAnimationFrame(animate)
-      }
-      frame = window.requestAnimationFrame(animate)
-    }
 
     return () => {
       window.cancelAnimationFrame(frame)
       resizeObserver.disconnect()
-      window.removeEventListener('scroll', handleScroll)
-      hostElement.removeEventListener('pointermove', handlePointerMove)
-      hostElement.removeEventListener('pointerleave', handlePointerLeave)
+      visibilityObserver.disconnect()
+      reducedMotionQuery.removeEventListener('change', handleMotionChange)
+      activeHostElement.removeEventListener('pointermove', handlePointerMove)
+      activeHostElement.removeEventListener('pointerleave', handlePointerLeave)
     }
   }, [])
 

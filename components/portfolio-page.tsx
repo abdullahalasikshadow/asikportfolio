@@ -2,35 +2,37 @@ import Image from 'next/image'
 import { ArrowDown, ArrowUpRight } from 'lucide-react'
 import { DhakaClock } from '@/components/dhaka-clock'
 import { HeroCanvas } from '@/components/hero-canvas'
+import { LabSection } from '@/components/lab-section'
 import { PortfolioInteractions } from '@/components/portfolio-interactions'
 import { SkillsConstellation } from '@/components/skills-constellation'
 
 const githubUrl = 'https://github.com/abdullahalasikshadow'
+const portfolioUrl = new URL(
+  process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : 'http://localhost:3000',
+)
 
 const personStructuredData = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: 'Abdullah Al Asik',
+  url: portfolioUrl.toString(),
+  image: new URL('/asik-portrait.webp', portfolioUrl).toString(),
+  sameAs: [githubUrl],
   description:
     'Third-year Statistics Honours student at Rajshahi College, based in Dhaka, Bangladesh. Work spans statistical analysis, full-stack engineering, and cinematic design.',
-  address: {
-    '@type': 'PostalAddress',
-    addressLocality: 'Dhaka',
-    addressCountry: 'BD',
-  },
-  sameAs: [githubUrl],
-  knowsAbout: ['Statistical analysis', 'Full-stack engineering', 'Cinematic design'],
 }
 
-function PortraitFrame({ variant }: { variant: 'hero' | 'about' }) {
-  const isHero = variant === 'hero'
-
+function PortraitFrame() {
   return (
-    <figure className={`portrait-figure ${isHero ? 'portrait-figure--hero' : 'portrait-figure--about'}`}>
+    <figure className="portrait-figure portrait-figure--hero">
       <div
-        className={`portrait-frame ${isHero ? 'portrait-frame--hero' : 'portrait-frame--quiet'}`}
+        className="portrait-frame portrait-frame--hero"
         data-portrait-frame
-        data-portrait-hero={isHero ? 'true' : undefined}
+        data-portrait-hero="true"
       >
         <Image
           className="portrait-image"
@@ -38,24 +40,24 @@ function PortraitFrame({ variant }: { variant: 'hero' | 'about' }) {
           alt="Portrait of Abdullah Al Asik"
           width={1600}
           height={2133}
-          priority={isHero}
-          quality={82}
-          sizes={
-            isHero
-              ? '(max-width: 760px) 76px, (max-width: 1280px) 10vw, 128px'
-              : '(max-width: 760px) 72px, (max-width: 1160px) 10vw, 116px'
-          }
+          priority
+          quality={75}
+          sizes="(max-width: 767px) 72vw, (max-width: 1360px) 38vw, 518px"
           data-portrait-image="true"
-          style={{ objectPosition: isHero ? '50% 45%' : '50% 42%' }}
+          style={{ objectPosition: '50% 42%' }}
         />
         <span className="portrait-tint" aria-hidden="true" />
         <span className="portrait-vignette" aria-hidden="true" />
         <span className="portrait-grain" aria-hidden="true" />
         <span className="portrait-grid" aria-hidden="true" />
+        <span className="portrait-axis" aria-hidden="true" />
         <span className="portrait-tick portrait-tick--top" aria-hidden="true" />
         <span className="portrait-tick portrait-tick--side" aria-hidden="true" />
       </div>
-      {isHero && <figcaption className="portrait-caption">Fig. 01, Dhaka</figcaption>}
+      <figcaption className="portrait-caption">
+        <span>Fig. 01, Dhaka</span>
+        <span>Based in Dhaka, Bangladesh</span>
+      </figcaption>
     </figure>
   )
 }
@@ -91,6 +93,11 @@ export function PortfolioPage() {
               </a>
             </li>
             <li>
+              <a className="nav-secondary" href="#lab">
+                Lab
+              </a>
+            </li>
+            <li>
               <a className="nav-contact" href="#contact">
                 Contact <ArrowUpRight aria-hidden="true" size={14} />
               </a>
@@ -105,45 +112,44 @@ export function PortfolioPage() {
           <div className="hero-veil" aria-hidden="true" />
 
           <div className="hero-inner">
-            <p className="hero-eyebrow">Field notes / 01 — Dhaka, Bangladesh</p>
+            <div className="hero-copy">
+              <p className="hero-eyebrow" data-reveal>
+                Field notes / 01 — Dhaka, Bangladesh
+              </p>
 
-            <h1 className="hero-title" id="hero-title">
-              <span className="hero-title-line">
-                <span className="hero-title-word" data-hero-word>
-                  Abdullah
+              <h1 className="hero-title" id="hero-title" data-headline>
+                <span className="hero-title-line display-line">
+                  <span className="display-word" data-headline-word>
+                    Abdullah
+                  </span>
                 </span>
-              </span>
-              <span className="hero-title-line">
-                <span className="hero-title-word" data-hero-word>
-                  Al Asik<span className="hero-period">.</span>
+                <span className="hero-title-line display-line">
+                  <span className="display-word" data-headline-word>
+                    Al
+                  </span>{' '}
+                  <span className="display-word" data-headline-word>
+                    Asik<span className="hero-period">.</span>
+                  </span>
                 </span>
-              </span>
-            </h1>
+              </h1>
 
-            <div className="hero-bottom">
               <p className="hero-description">
                 Third-year Statistics Honours student. Working across statistical analysis,
                 full-stack engineering, and cinematic design.
               </p>
+            </div>
 
-              <div className="hero-side-info">
-                <a className="hero-scroll-cue" href="#about" data-magnetic>
-                  <span>Scroll to explore</span>
-                  <span className="hero-scroll-mark">
-                    <ArrowDown aria-hidden="true" size={14} />
-                  </span>
-                </a>
-
-                <div className="hero-avatar-lockup">
-                  <PortraitFrame variant="hero" />
-                  <div className="hero-avatar-copy">
-                    <span>Based in</span>
-                    <span>Dhaka, Bangladesh</span>
-                  </div>
-                </div>
-              </div>
+            <div className="hero-portrait-column">
+              <PortraitFrame />
             </div>
           </div>
+
+          <a className="hero-scroll-cue" href="#about" data-magnetic>
+            <span>Scroll to explore</span>
+            <span className="hero-scroll-mark">
+              <ArrowDown aria-hidden="true" size={14} />
+            </span>
+          </a>
         </section>
 
         <section className="content-section about-section" id="about" aria-labelledby="about-title">
@@ -154,10 +160,16 @@ export function PortfolioPage() {
 
           <div className="about-layout">
             <div data-reveal>
-              <h2 className="section-title" id="about-title">
-                One eye on
-                <br />
-                the <em>model.</em>
+              <h2 className="section-title" id="about-title" data-headline>
+                <span className="display-line">
+                  <span className="display-word" data-headline-word>One</span>{' '}
+                  <span className="display-word" data-headline-word>eye</span>{' '}
+                  <span className="display-word" data-headline-word>on</span>
+                </span>
+                <span className="display-line">
+                  <span className="display-word" data-headline-word>the</span>{' '}
+                  <span className="display-word" data-headline-word><em>model.</em></span>
+                </span>
               </h2>
             </div>
 
@@ -178,22 +190,38 @@ export function PortfolioPage() {
               <span>Observation / interpretation</span>
               <span>Signal 01 — 03</span>
             </div>
-            <div className="about-plot-visual">
-              <svg viewBox="0 0 1000 150" preserveAspectRatio="none" aria-hidden="true">
-                <line className="plot-grid-line" x1="0" y1="30" x2="1000" y2="30" />
-                <line className="plot-grid-line" x1="0" y1="75" x2="1000" y2="75" />
-                <line className="plot-grid-line" x1="0" y1="120" x2="1000" y2="120" />
+            <div className="about-plot-visual signal-chart">
+              <svg viewBox="0 0 1000 230" preserveAspectRatio="none" aria-hidden="true">
+                <line className="plot-grid-line" x1="0" y1="40" x2="1000" y2="40" />
+                <line className="plot-grid-line" x1="0" y1="100" x2="1000" y2="100" />
+                <line className="plot-grid-line" x1="0" y1="160" x2="1000" y2="160" />
                 <path
                   className="plot-curve"
                   data-curve-line
-                  d="M 0 119 C 98 113, 139 102, 212 102 C 295 102, 321 38, 396 34 C 474 29, 492 94, 579 93 C 677 92, 706 58, 785 63 C 866 69, 906 90, 1000 74"
+                  d="M 0 158 C 85 157, 124 137, 200 137 C 290 137, 358 44, 500 48 C 634 52, 681 126, 800 119 C 874 115, 934 87, 1000 80"
                 />
-                <circle className="plot-point" cx="212" cy="102" r="3" />
-                <circle className="plot-point" cx="396" cy="34" r="3" />
-                <circle className="plot-point" cx="579" cy="93" r="3" />
-                <circle className="plot-point" cx="785" cy="63" r="3" />
+                <line className="plot-axis" x1="20" y1="180" x2="980" y2="180" />
+                <line className="plot-crosshair plot-crosshair--analysis" x1="200" y1="137" x2="200" y2="180" />
+                <line className="plot-crosshair plot-crosshair--engineering" x1="500" y1="48" x2="500" y2="180" />
+                <line className="plot-crosshair plot-crosshair--design" x1="800" y1="119" x2="800" y2="180" />
+                <line className="plot-tick" x1="200" y1="176" x2="200" y2="185" />
+                <line className="plot-tick" x1="500" y1="176" x2="500" y2="185" />
+                <line className="plot-tick" x1="800" y1="176" x2="800" y2="185" />
+                <circle className="plot-point plot-point--analysis" cx="200" cy="137" r="3.5" />
+                <circle className="plot-point plot-point--engineering" cx="500" cy="48" r="3.5" />
+                <circle className="plot-point plot-point--design" cx="800" cy="119" r="3.5" />
               </svg>
-              <PortraitFrame variant="about" />
+              <div className="signal-point-labels" role="group" aria-label="Three disciplines in the signal chart">
+                <div className="signal-chart-point signal-chart-point--analysis" data-point="analysis" role="img" tabIndex={0} aria-label="01 Statistical analysis">
+                  01 Statistical analysis
+                </div>
+                <div className="signal-chart-point signal-chart-point--engineering" data-point="engineering" role="img" tabIndex={0} aria-label="02 Full-stack engineering">
+                  02 Full-stack engineering
+                </div>
+                <div className="signal-chart-point signal-chart-point--design" data-point="design" role="img" tabIndex={0} aria-label="03 Cinematic design">
+                  03 Cinematic design
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -206,10 +234,15 @@ export function PortfolioPage() {
 
           <div className="practice-layout">
             <div className="practice-heading" data-reveal>
-              <h2 className="section-title" id="practice-title">
-                Three fields.
-                <br />
-                One <em>frame.</em>
+              <h2 className="section-title" id="practice-title" data-headline>
+                <span className="display-line">
+                  <span className="display-word" data-headline-word>Three</span>{' '}
+                  <span className="display-word" data-headline-word>fields.</span>
+                </span>
+                <span className="display-line">
+                  <span className="display-word" data-headline-word>One</span>{' '}
+                  <span className="display-word" data-headline-word><em>frame.</em></span>
+                </span>
               </h2>
               <p>
                 Select a point in the constellation to explore the three areas my work spans.
@@ -220,67 +253,7 @@ export function PortfolioPage() {
           </div>
         </section>
 
-        <section className="content-section project-section" id="work" aria-labelledby="work-title">
-          <div className="section-label" data-reveal>
-            <span>03 / Selected project</span>
-            <span>01 — AURA Bot</span>
-          </div>
-
-          <div className="project-layout">
-            <figure
-              className="project-art"
-              data-project-pin
-              data-cursor="interactive"
-              aria-label="AURA Bot, a Telegram bot"
-            >
-              <div className="project-art-grid" aria-hidden="true" />
-              <div className="project-art-top" aria-hidden="true">
-                <span>Project / 001</span>
-                <span>Telegram / Bot</span>
-              </div>
-              <div className="project-signal" aria-hidden="true">
-                <svg viewBox="0 0 600 400" preserveAspectRatio="none">
-                  <path d="M 14 300 C 94 260, 138 325, 205 236 S 300 102, 356 192 S 448 320, 586 82" />
-                  <circle cx="205" cy="236" r="4" />
-                  <circle cx="356" cy="192" r="4" />
-                  <circle cx="500" cy="196" r="4" />
-                </svg>
-                <div className="project-wordmark">
-                  AURA
-                  <span>BOT</span>
-                </div>
-              </div>
-              <figcaption className="project-art-footer">
-                <span>AURA Bot</span>
-                <span>Telegram bot</span>
-              </figcaption>
-            </figure>
-
-            <div className="project-story" data-reveal>
-              <p className="project-type">Featured project / 01</p>
-              <h2 className="project-title" id="work-title">
-                AURA
-                <span>Bot.</span>
-              </h2>
-              <p className="project-summary">AURA Bot is a Telegram bot.</p>
-
-              <dl className="project-facts">
-                <div>
-                  <dt className="fact-label">Type</dt>
-                  <dd>Telegram bot</dd>
-                </div>
-                <div>
-                  <dt className="fact-label">Project</dt>
-                  <dd>AURA Bot</dd>
-                </div>
-              </dl>
-
-              <a className="project-profile-link" href={githubUrl} target="_blank" rel="noreferrer">
-                GitHub profile <ArrowUpRight aria-hidden="true" size={15} />
-              </a>
-            </div>
-          </div>
-        </section>
+        <LabSection />
 
         <section className="content-section journey-section" id="journey" aria-labelledby="journey-title">
           <div className="section-label" data-reveal>
@@ -289,11 +262,14 @@ export function PortfolioPage() {
           </div>
 
           <div className="journey-layout">
-            <h2 className="journey-title" id="journey-title" data-reveal>
-              In <em>progress.</em>
+            <h2 className="journey-title" id="journey-title" data-headline>
+              <span className="display-word" data-headline-word>In</span>{' '}
+              <span className="display-word" data-headline-word><em>progress.</em></span>
             </h2>
 
             <div className="journey-now" data-reveal>
+              <span className="journey-timeline-line" data-journey-line aria-hidden="true" />
+              <span className="journey-timeline-dot" data-journey-dot aria-hidden="true" />
               <span className="journey-current">Now / Third year</span>
               <h3>Statistics Honours</h3>
               <p>
@@ -316,10 +292,14 @@ export function PortfolioPage() {
               05 / Contact
             </p>
 
-            <h2 className="contact-title" id="contact-title" data-reveal>
-              Start a
-              <br />
-              <em>conversation.</em>
+            <h2 className="contact-title" id="contact-title" data-headline>
+              <span className="display-line">
+                <span className="display-word" data-headline-word>Start</span>{' '}
+                <span className="display-word" data-headline-word>a</span>
+              </span>
+              <span className="display-line">
+                <span className="display-word" data-headline-word><em>conversation.</em></span>
+              </span>
             </h2>
 
             <div className="contact-bottom" data-reveal>

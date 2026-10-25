@@ -5,6 +5,29 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 
+function cubicBezierEase(progress: number) {
+  let parameter = progress
+  let lowerBound = 0
+  let upperBound = 1
+
+  for (let iteration = 0; iteration < 8; iteration += 1) {
+    const inverse = 1 - parameter
+    const x = 3 * inverse * inverse * parameter * 0.22 + 3 * inverse * parameter * parameter * 0.36 + parameter ** 3
+    const error = x - progress
+    if (Math.abs(error) < 0.001) break
+
+    if (error < 0) lowerBound = parameter
+    else upperBound = parameter
+
+    const derivative = 3 * inverse * inverse * 0.22 + 6 * inverse * parameter * (0.36 - 0.22) + 3 * parameter * parameter * (1 - 0.36)
+    const candidate = derivative > 0 ? parameter - error / derivative : Number.NaN
+    parameter = candidate > lowerBound && candidate < upperBound ? candidate : (lowerBound + upperBound) / 2
+  }
+
+  const inverse = 1 - parameter
+  return 3 * inverse * inverse * parameter + 3 * inverse * parameter * parameter + parameter ** 3
+}
+
 export function PortfolioInteractions() {
   const cursorRef = useRef<HTMLDivElement>(null)
   const [progress, setProgress] = useState(0)
@@ -60,56 +83,61 @@ export function PortfolioInteractions() {
     }
 
     const context = gsap.context(() => {
-      const heroWords = gsap.utils.toArray<HTMLElement>('[data-hero-word]')
-      if (heroWords.length) {
+      gsap.utils.toArray<HTMLElement>('[data-headline]').forEach((heading) => {
+        const words = gsap.utils.toArray<HTMLElement>('[data-headline-word]', heading)
+        if (!words.length) return
+
         gsap.fromTo(
-          heroWords,
+          words,
           { yPercent: 112, autoAlpha: 0 },
           {
             yPercent: 0,
             autoAlpha: 1,
-            duration: 1.15,
-            delay: 0.12,
-            stagger: 0.13,
-            ease: 'power4.out',
+            duration: 0.82,
+            delay: heading.classList.contains('hero-title') ? 0.12 : 0,
+            stagger: 0.075,
+            ease: cubicBezierEase,
+            scrollTrigger: heading.classList.contains('hero-title')
+              ? undefined
+              : {
+                  trigger: heading,
+                  start: 'top 88%',
+                  once: true,
+                },
           },
         )
-      }
+      })
 
       gsap.utils.toArray<HTMLElement>('[data-portrait-frame]').forEach((frame) => {
         const image = frame.querySelector<HTMLImageElement>('[data-portrait-image]')
         if (!image) return
 
         const isHero = frame.dataset.portraitHero === 'true'
-        const revealOptions = {
-          clipPath: 'inset(0 0 0% 0)',
-          duration: isHero ? 1.15 : 0.9,
-          ease: 'power3.inOut',
-        }
-
         if (isHero) {
-          gsap.fromTo(frame, { clipPath: 'inset(0 0 100% 0)' }, { ...revealOptions, delay: 0.32 })
-        } else {
-          gsap.fromTo(frame, { clipPath: 'inset(0 0 100% 0)' }, {
-            ...revealOptions,
-            scrollTrigger: {
-              trigger: frame,
-              start: 'top 88%',
-              once: true,
+          gsap.fromTo(
+            frame,
+            { clipPath: 'inset(100% 0 0 0)' },
+            {
+              clipPath: 'inset(0 0 0 0)',
+              duration: 1.2,
+              delay: 0.28,
+              ease: cubicBezierEase,
             },
-          })
-        }
+          )
 
-        gsap.to(image, {
-          yPercent: isHero ? -4 : -2,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: frame,
-            start: 'top bottom',
-            end: 'bottom top',
-            scrub: true,
-          },
-        })
+          if (window.innerWidth >= 768) {
+            gsap.to(image, {
+              y: 24,
+              ease: 'none',
+              scrollTrigger: {
+                trigger: frame,
+                start: 'top bottom',
+                end: 'bottom top',
+                scrub: true,
+              },
+            })
+          }
+        }
       })
 
       gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((element) => {
@@ -119,8 +147,8 @@ export function PortfolioInteractions() {
           {
             y: 0,
             autoAlpha: 1,
-            duration: 0.82,
-            ease: 'power2.out',
+            duration: 0.8,
+            ease: cubicBezierEase,
             scrollTrigger: {
               trigger: element,
               start: 'top 88%',
@@ -146,20 +174,38 @@ export function PortfolioInteractions() {
         })
       }
 
-      if (!isCoarsePointer && window.innerWidth >= 1100) {
-        const projectSection = document.querySelector<HTMLElement>('.project-section')
-        const projectVisual = document.querySelector<HTMLElement>('[data-project-pin]')
+      const contactPanel = document.querySelector<HTMLElement>('.contact-section')
+      if (contactPanel) {
+        gsap.fromTo(
+          contactPanel,
+          { clipPath: 'inset(100% 0 0 0)' },
+          {
+            clipPath: 'inset(0 0 0 0)',
+            duration: 1.05,
+            ease: cubicBezierEase,
+            scrollTrigger: {
+              trigger: contactPanel,
+              start: 'top 85%',
+              once: true,
+            },
+          },
+        )
+      }
 
-        if (projectSection && projectVisual) {
-          ScrollTrigger.create({
-            trigger: projectSection,
-            start: 'top top+=96',
-            end: '+=360',
-            pin: projectVisual,
-            pinSpacing: true,
-            anticipatePin: 1,
-          })
-        }
+      const timelineLine = document.querySelector<HTMLElement>('[data-journey-line]')
+      const timelineDot = document.querySelector<HTMLElement>('[data-journey-dot]')
+      if (timelineLine && timelineDot) {
+        const timeline = gsap.timeline({
+          scrollTrigger: {
+            trigger: '#journey',
+            start: 'top 78%',
+            once: true,
+          },
+        })
+        timeline.fromTo(timelineLine, { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: cubicBezierEase })
+        timeline.fromTo(timelineDot, { scale: 0.35, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.4, ease: cubicBezierEase }, '-=0.18')
+        timeline.to(timelineDot, { scale: 1.45, duration: 0.22, ease: cubicBezierEase }, '+=0.08')
+        timeline.to(timelineDot, { scale: 1, duration: 0.3, ease: cubicBezierEase })
       }
     }, document.body)
 
@@ -188,12 +234,11 @@ export function PortfolioInteractions() {
     let frame = 0
 
     function handlePointerMove(event: PointerEvent) {
-  const isInteractive =
-    event.target instanceof Element &&
-    Boolean(event.target.closest('a, button, [data-cursor="interactive"]'))
-  activeCursor.dataset.visible = 'true'
-  activeCursor.dataset.active = String(isInteractive)
-
+      const isInteractive =
+        event.target instanceof Element &&
+        Boolean(event.target.closest('a, button, [data-cursor="interactive"]'))
+      activeCursor.dataset.visible = 'true'
+      activeCursor.dataset.active = String(isInteractive)
 
       window.cancelAnimationFrame(frame)
       frame = window.requestAnimationFrame(() => {
@@ -222,18 +267,18 @@ export function PortfolioInteractions() {
     const listeners = magneticTargets.map((target) => {
       const handlePointerMove = (event: PointerEvent) => {
         const bounds = target.getBoundingClientRect()
-        const offsetX = (event.clientX - bounds.left - bounds.width / 2) * 0.12
-        const offsetY = (event.clientY - bounds.top - bounds.height / 2) * 0.12
+        const offsetX = Math.max(-8, Math.min(8, ((event.clientX - bounds.left) / bounds.width - 0.5) * 16))
+        const offsetY = Math.max(-8, Math.min(8, ((event.clientY - bounds.top) / bounds.height - 0.5) * 16))
         gsap.to(target, {
           x: offsetX,
           y: offsetY,
           duration: 0.38,
-          ease: 'power3.out',
+          ease: cubicBezierEase,
           overwrite: true,
         })
       }
       const reset = () => {
-        gsap.to(target, { x: 0, y: 0, duration: 0.55, ease: 'elastic.out(1, 0.55)' })
+        gsap.to(target, { x: 0, y: 0, duration: 0.55, ease: cubicBezierEase })
       }
 
       target.addEventListener('pointermove', handlePointerMove)
