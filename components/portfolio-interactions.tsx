@@ -63,7 +63,7 @@ export function PortfolioInteractions() {
 
     gsap.registerPlugin(ScrollTrigger)
 
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
     let lenis: Lenis | null = null
     let lenisTick: ((time: number) => void) | null = null
     let updateScroll: (() => void) | null = null
@@ -227,7 +227,7 @@ export function PortfolioInteractions() {
     const activeCursor = cursor
 
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches
+    const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
     if (prefersReducedMotion || isCoarsePointer) return
 
     document.documentElement.classList.add('has-custom-cursor')
@@ -258,7 +258,8 @@ export function PortfolioInteractions() {
   useEffect(() => {
     if (
       window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
-      window.matchMedia('(pointer: coarse)').matches
+      window.matchMedia('(pointer: coarse)').matches ||
+      window.innerWidth < 768
     ) {
       return
     }

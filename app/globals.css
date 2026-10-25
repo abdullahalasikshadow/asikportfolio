@@ -296,7 +296,6 @@
 .hero-avatar-copy span,
 .hero-scroll-cue,
 
-.fact-label,
 .journey-current,
 .journey-place-label,
 .contact-overline,
@@ -1472,6 +1471,14 @@ html.has-custom-cursor .portfolio-cursor[data-visible='true'] {
   margin-inline: auto;
 }
 
+.practice-section,
+.journey-section {
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
+  padding-inline: var(--page-gutter);
+}
+
 .site-header {
   min-height: 84px;
 }
@@ -1488,7 +1495,7 @@ html.has-custom-cursor .portfolio-cursor[data-visible='true'] {
 .hero-inner {
   display: grid;
   width: min(100%, 1360px);
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 38%);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, min(38vw, 518px));
   align-items: center;
   gap: clamp(2rem, 5vw, 6rem);
   margin: auto;
