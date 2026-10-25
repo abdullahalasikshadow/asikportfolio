@@ -1,7 +1,25 @@
-# ABDULLAH AL ASIK
+<div align="center">
 
-Professional Video Editor · Visual Storyteller
+  <h1>ABDULLAH AL ASIK</h1>
 
-🌐 [Portfolio](https://abdullahalasik.vercel.app)
+  <p>
+    <strong>VIDEO EDITOR</strong> &nbsp;·&nbsp; VISUAL STORYTELLER
+  </p>
 
-Built with Next.js & TypeScript.
+  <br>
+
+  <a href="https://abdullahalasik.vercel.app">
+    <strong>↗ &nbsp; EXPLORE MY PORTFOLIO</strong>
+  </a>
+
+  <br><br>
+
+  <sub>abdullahalasik.vercel.app</sub>
+
+  <br><br>
+
+  <hr>
+
+  <sub>Built with Next.js & TypeScript</sub>
+
+</div>
