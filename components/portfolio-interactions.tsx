@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
+import { Logo } from '@/components/logo'
 
 function cubicBezierEase(progress: number) {
   let parameter = progress
@@ -300,7 +301,7 @@ export function PortfolioInteractions() {
       {loaderState !== 'hidden' && (
         <div className="intro-loader" aria-hidden="true" data-complete={loaderState === 'complete'}>
           <div className="intro-loader-top">
-            <span>A / A</span>
+            <Logo height={40} />
             <span>Dhaka · Bangladesh</span>
           </div>
           <div className="intro-loader-count">
