@@ -1,31 +1,15 @@
 import Image from 'next/image'
 import { ArrowDown, ArrowUpRight } from 'lucide-react'
+import { ContactMethods } from '@/components/contact-methods'
 import { DhakaClock } from '@/components/dhaka-clock'
 import { Logo } from '@/components/logo'
 import { HeroCanvas } from '@/components/hero-canvas'
 import { LabSection } from '@/components/lab-section'
 import { PortfolioInteractions } from '@/components/portfolio-interactions'
 import { SkillsConstellation } from '@/components/skills-constellation'
+import { contact } from '@/content/site'
 
 const githubUrl = 'https://github.com/abdullahalasikshadow'
-const portfolioUrl = new URL(
-  process.env.VERCEL_PROJECT_PRODUCTION_URL
-    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : 'http://localhost:3000',
-)
-
-const personStructuredData = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: 'Abdullah Al Asik',
-  url: portfolioUrl.toString(),
-  image: new URL('/asik-portrait.webp', portfolioUrl).toString(),
-  sameAs: [githubUrl],
-  description:
-    'Third-year Statistics Honours student at Rajshahi College, based in Dhaka, Bangladesh. Work spans statistical analysis, full-stack engineering, and cinematic design.',
-}
 
 function PortraitFrame() {
   return (
@@ -64,6 +48,14 @@ function PortraitFrame() {
 }
 
 export function PortfolioPage() {
+  const hasAdditionalContact = Boolean(contact.email || contact.linkedin || contact.resume)
+  const githubContactPill = (
+    <a className="contact-link" href={githubUrl} target="_blank" rel="noreferrer" data-magnetic>
+      <span>abdullahalasikshadow</span>
+      <ArrowUpRight aria-hidden="true" size={18} />
+    </a>
+  )
+
   return (
     <div className="portfolio-shell">
       <a className="skip-link" href="#main-content">
@@ -306,10 +298,18 @@ export function PortfolioPage() {
                 For contact, find me on GitHub as abdullahalasikshadow.
               </p>
 
-              <a className="contact-link" href={githubUrl} target="_blank" rel="noreferrer" data-magnetic>
-                <span>abdullahalasikshadow</span>
-                <ArrowUpRight aria-hidden="true" size={18} />
-              </a>
+              {hasAdditionalContact ? (
+                <div className="contact-link-stack">
+                  {githubContactPill}
+                  <ContactMethods
+                    email={contact.email}
+                    linkedin={contact.linkedin}
+                    resume={contact.resume}
+                  />
+                </div>
+              ) : (
+                githubContactPill
+              )}
 
               <div className="contact-location">
                 <span className="contact-location-label">Based in</span>
@@ -329,12 +329,6 @@ export function PortfolioPage() {
         </div>
       </footer>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(personStructuredData).replace(/</g, '\\u003c'),
-        }}
-      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, type KeyboardEvent } from 'react'
+import { Logo } from '@/components/logo'
 
 const disciplines = [
   {
@@ -61,7 +62,7 @@ export function SkillsConstellation() {
           <line x1="50" y1="50" x2={activeDiscipline.x} y2={activeDiscipline.y} />
         </svg>
         <span className="skill-map-core" aria-hidden="true">
-          AA
+          <Logo height={28} />
         </span>
         {disciplines.map((discipline, index) => (
           <button
